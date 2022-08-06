@@ -23,9 +23,17 @@ class PRAW:
                 if not url:
                     return
 
-                await save_video_from_url(url, name=submission.id)
+                await save_video_from_url(
+                    url,
+                    name=submission.id,
+                    save_to_dir=sub,
+                )
             else:
-                await save_image_from_url(url=submission.url, name=submission.id)
+                await save_image_from_url(
+                    url=submission.url,
+                    name=submission.id,
+                    save_to_dir=sub,
+                )
 
                 if hasattr(submission, "gallery_data"):
                     ids = [
@@ -36,7 +44,11 @@ class PRAW:
                         url = submission.media_metadata[id]["p"][0]["u"]
                         url = url.split("?")[0].replace("preview", "i")
 
-                        await save_image_from_url(url=url, name=id)
+                        await save_image_from_url(
+                            url=url,
+                            name=id,
+                            save_to_dir=sub,
+                        )
 
                 if hasattr(submission, "crosspost_parent_list"):
                     for crosspost in submission.crosspost_parent_list:
@@ -49,7 +61,11 @@ class PRAW:
                             url = crosspost["media_metadata"][id]["p"][0]["u"]
                             url = url.split("?")[0].replace("preview", "i")
 
-                            await save_image_from_url(url=url, name=id)
+                            await save_image_from_url(
+                                url=url,
+                                name=id,
+                                save_to_dir=sub,
+                            )
 
 
 praw = PRAW()

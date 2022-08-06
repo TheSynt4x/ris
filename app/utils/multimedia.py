@@ -7,7 +7,7 @@ from PIL import Image, UnidentifiedImageError
 from app.core import logger
 
 
-async def save_image_from_url(url, name, format="png"):
+async def save_image_from_url(url, name, format="png", save_to_dir=None):
     """
     Save an image from URL
 
@@ -15,8 +15,15 @@ async def save_image_from_url(url, name, format="png"):
         - url: image URL
         - name: output name
         - format: set image output format
+        - save_to_dir: which directory to save it to
     """
     filename = f"{name}.{format}"
+
+    if save_to_dir:
+        if not os.path.exists(save_to_dir):
+            os.makedirs(f"assets/{save_to_dir}", exist_ok=True)
+
+        filename = f"{save_to_dir}/{name}.{format}"
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
@@ -34,7 +41,7 @@ async def save_image_from_url(url, name, format="png"):
             return
 
 
-async def save_video_from_url(url, name, format="mp4"):
+async def save_video_from_url(url, name, format="mp4", save_to_dir=None):
     """
     Save video from URL
 
@@ -42,9 +49,16 @@ async def save_video_from_url(url, name, format="mp4"):
         - url: video URL
         - name: output name
         - format: set video output format
+        - save_to_dir: which directory to save it to
     """
 
     filename = f"{name}.{format}"
+
+    if save_to_dir:
+        if not os.path.exists(save_to_dir):
+            os.makedirs(f"assets/{save_to_dir}", exist_ok=True)
+
+        filename = f"{save_to_dir}/{name}.{format}"
 
     if os.path.isfile(f"assets/{filename}"):
         logger.info(f"skipping: {filename}")
