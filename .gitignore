@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+scripts/devserver.sh
+
+.vscode
+
+**/assets/*
+**/logs/*
+
+subreddits.txt
+.mypy_cache/**

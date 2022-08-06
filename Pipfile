@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+httpx = "*"
+pydantic = "*"
+pillow = "*"
+asyncpraw = "*"
+
+[dev-packages]
+black = "*"
+isort = "*"
+flake8 = "*"
+types-pillow = "*"
+autoflake = "*"
+
+[requires]
+python_version = "3.10"
+
+[pipenv]
+allow_prereleases = false
