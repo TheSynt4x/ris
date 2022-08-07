@@ -8,6 +8,7 @@ scripts/devserver.sh
 
 **/assets/*
 **/logs/*
+**/categories/*
 
 subreddits.txt
 .mypy_cache/**

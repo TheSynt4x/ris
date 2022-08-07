@@ -4,7 +4,7 @@ from app.utils.multimedia import save_image_from_url, save_video_from_url
 
 
 class PRAW:
-    async def get_submissions(self, reddit: Reddit, sub: str) -> None:
+    async def get_submissions(self, reddit: Reddit, sub: str, cat: str = None) -> None:
         """
         Get reddit submissions and save them
 
@@ -14,9 +14,7 @@ class PRAW:
 
         subreddit = await reddit.subreddit(sub)
 
-        async for submission in subreddit.new(limit=100):
-            print(submission.url)
-
+        async for submission in subreddit.new(limit=1):
             if submission.is_video:
                 url = submission.secure_media.get("reddit_video").get("fallback_url")
 
@@ -27,12 +25,14 @@ class PRAW:
                     url,
                     name=submission.id,
                     save_to_dir=sub,
+                    category=cat,
                 )
             else:
                 await save_image_from_url(
                     url=submission.url,
                     name=submission.id,
                     save_to_dir=sub,
+                    category=cat,
                 )
 
                 if hasattr(submission, "gallery_data"):
@@ -48,6 +48,7 @@ class PRAW:
                             url=url,
                             name=id,
                             save_to_dir=sub,
+                            category=cat,
                         )
 
                 if hasattr(submission, "crosspost_parent_list"):
@@ -65,6 +66,7 @@ class PRAW:
                                 url=url,
                                 name=id,
                                 save_to_dir=sub,
+                                category=cat,
                             )
 
 
