@@ -18,7 +18,9 @@ devserver:
 install:
 	mv scripts/devserver.example.sh scripts/devserver.sh
 	mv subreddits.example.txt subreddits.txt
-	mkdir logs/
-	mkdir assets/
+	mkdir -p logs/
+	mkdir -p assets/
+	mkdir -p categories/
+	echo "" > categories/example.txt
 
 	echo "You can now change your credentials in devserver.sh and subreddits in config"

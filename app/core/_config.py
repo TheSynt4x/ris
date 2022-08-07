@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 from pydantic import BaseSettings
 
@@ -16,6 +16,7 @@ class Config(BaseSettings):
     )
 
     subreddits: List[str] = []
+    categories: Dict[str, Any] = {}
 
 
 settings = Config()
