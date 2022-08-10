@@ -45,9 +45,9 @@ class DatabaseWrapper:
 
         return await self._get(sql)
 
-    async def get_images_by_category(self, category_id, type=types.NEW):
+    async def get_submissions_by_category(self, category_id, type=types.NEW):
         """
-        Get images by category id and type
+        Get submissions by category id and type
 
         Arguments:
             - category: which category to get from
@@ -56,14 +56,14 @@ class DatabaseWrapper:
 
         sql = """
             SELECT reddit_image_id, url, category_id, timestamp
-            FROM images WHERE category_id = %s AND type = %s
+            FROM submissions WHERE category_id = %s AND type = %s
         """
 
         return await self._get(sql, (category_id, type))
 
-    async def get_images_by_subreddit(self, subreddit_id, type=types.NEW):
+    async def get_submissions_by_subreddit(self, subreddit_id, type=types.NEW):
         """
-        Get images by subreddit id and type
+        Get submissions by subreddit id and type
 
         Arguments:
             - category: which category to get from
@@ -72,7 +72,7 @@ class DatabaseWrapper:
 
         sql = """
             SELECT reddit_image_id, url, subreddit_id, timestamp
-            FROM images WHERE subreddit_id = %s AND type = %s
+            FROM submissions WHERE subreddit_id = %s AND type = %s
         """
 
         return await self._get(sql, (subreddit_id, type))
@@ -87,32 +87,32 @@ class DatabaseWrapper:
 
         sql = """
             SELECT reddit_image_id, url, subreddit_id, category_id, timestamp
-            FROM images WHERE reddit_image_id = %s
+            FROM submissions WHERE reddit_image_id = %s
         """
 
-        return await self._get(sql, reddit_image_id)
+        image = await self._get(sql, reddit_image_id)
 
-    async def create_image(
-        self, url, reddit_image_id, subreddit_id=None, category_id=None
-    ):
+        if not len(image):
+            return None
+
+        return image
+
+    async def create_submissions(self, data):
         """
-        Create a new image entity
+        Create submissions with batching call
 
         Arguments:
-            - url: image url
-            - reddit_image_id: reddit's internal ID for the image
-            - subreddit_id: which subreddit it was posted to
-            - category_id: which category it should be saved under
+            - data: list of tuples containing id, sub_id and cat_id
         """
 
         sql = """
-            INSERT INTO images
-                (url, reddit_image_id, subreddit_id, category_id, NOW())
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO submissions
+                (url, reddit_image_id, type, subreddit_id, category_id)
+            VALUES (%s, %s, %s, %s, %s);
         """
 
-        async with await self.pool.begin() as tx:
-            await tx.execute(sql, (url, reddit_image_id, subreddit_id, category_id))
+        async with await self.pool.begin() as transaction:
+            await transaction.executemany(sql, data)
 
     async def get_settings(self):
         """
@@ -122,10 +122,17 @@ class DatabaseWrapper:
         return await self._get("SELECT k, v FROM settings")
 
     async def get_subreddit_by_name(self, name):
-        return await self._get("SELECT id FROM subreddits WHERE name = %s", (name))
+        return await self._get(
+            "SELECT id, name, post_limit FROM subreddits WHERE name = %s", (name)
+        )
 
-    async def get_category_by_name(self, name):
-        return await self._get("SELECT id FROM categories WHERE name = %s", (name))
+    async def get_category_by_name(self, name, sub):
+        sql = """
+            SELECT id, name, subreddit, post_limit FROM categories
+            WHERE name = %s AND subreddit = %s
+        """
+
+        return await self._get(sql, (name, sub))
 
 
 db = DatabaseWrapper()
