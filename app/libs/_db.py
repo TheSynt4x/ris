@@ -10,7 +10,7 @@ class DatabaseWrapper:
             idle_seconds=7200,
             wait_connection_timeout=3,
             host="127.0.0.1",
-            user="user1",
+            user="user",
             passwd="1234",
             db="ris",
             charset="utf8",
@@ -108,8 +108,7 @@ class DatabaseWrapper:
         sql = """
             INSERT INTO images
                 (url, reddit_image_id, subreddit_id, category_id, NOW())
-            VALUES
-                (%s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s)
         """
 
         async with await self.pool.begin() as tx:
@@ -121,6 +120,12 @@ class DatabaseWrapper:
         """
 
         return await self._get("SELECT k, v FROM settings")
+
+    async def get_subreddit_by_name(self, name):
+        return await self._get("SELECT id FROM subreddits WHERE name = %s", (name))
+
+    async def get_category_by_name(self, name):
+        return await self._get("SELECT id FROM categories WHERE name = %s", (name))
 
 
 db = DatabaseWrapper()

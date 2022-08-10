@@ -18,5 +18,7 @@ class Config(BaseSettings):
     subreddits: List[str] = []
     categories: Dict[str, Any] = {}
 
+    db_conn: bool = False
+
 
 settings = Config()

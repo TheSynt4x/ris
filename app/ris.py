@@ -66,9 +66,13 @@ async def load_settings():
         db_settings = None
 
     if not db_settings:
+        settings.db_conn = False
+
         load_subreddits_from_file()
         load_categories_from_file()
     else:
+        settings.db_conn = True
+
         await load_subreddits_from_db()
         await load_categories_from_db()
 
