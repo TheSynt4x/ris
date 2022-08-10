@@ -4,7 +4,8 @@ import os
 from asyncpraw import Reddit
 
 from app.core import logger, settings
-from app.libs import praw
+from app.libs import db, praw
+from app.utils import find_in_sql_tuple
 
 
 def load_subreddits_from_file():
@@ -39,13 +40,66 @@ def load_categories_from_file():
     logger.info(f"loaded: {settings.categories}")
 
 
+async def load_subreddits_from_db():
+    db_subreddits = await db._get("SELECT id, name FROM subreddits")
+    settings.subreddits = [s[1] for s in db_subreddits]
+
+    logger.info(f"loaded: {settings.subreddits}")
+
+
+async def load_categories_from_db():
+    db_categories = await db._get("SELECT id, name, subreddit FROM categories")
+
+    for (_, name, subreddit) in db_categories:
+        if name not in settings.categories:
+            settings.categories[name.lower()] = [subreddit.lower()]
+        else:
+            settings.categories[name.lower()].append(subreddit.lower())
+
+    logger.info(f"loaded: {settings.categories}")
+
+
+async def load_settings():
+    try:
+        db_settings = await db.get_settings()
+    except Exception:
+        db_settings = None
+
+    if not db_settings:
+        settings.db_conn = False
+
+        load_subreddits_from_file()
+        load_categories_from_file()
+    else:
+        settings.db_conn = True
+
+        await load_subreddits_from_db()
+        await load_categories_from_db()
+
+        if not (settings.client_id and settings.client_secret):
+            logger.info("no client id set from sh file, loading from db")
+
+            settings.client_id = find_in_sql_tuple(db_settings, "client_id")
+            settings.client_secret = find_in_sql_tuple(db_settings, "client_secret")
+
+            if not (settings.client_id and settings.client_secret):
+                logger.error("could not establish connection")
+
+        username = find_in_sql_tuple(db_settings, "username")
+        password = find_in_sql_tuple(db_settings, "password")
+
+        if username and password:
+            logger.error("connection must be established from sh file for user creds")
+
+        # todo: dropbox api token
+
+
 async def main():
     """
     Main entry point
     """
 
-    load_subreddits_from_file()
-    load_categories_from_file()
+    await load_settings()
 
     async with Reddit(
         client_id=settings.client_id,
@@ -56,7 +110,7 @@ async def main():
     ) as reddit:
         subreddits = []
 
-        if os.path.exists("categories"):
+        if settings.categories.values():
             for category, subs in settings.categories.items():
                 for subreddit in subs:
                     if subreddit in settings.subreddits:

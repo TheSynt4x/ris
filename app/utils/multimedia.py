@@ -44,6 +44,7 @@ async def save_image_from_url(url, name, format="png", save_to_dir=None, categor
             image = Image.open(BytesIO(response.content))
             image.save(f"assets/{filename}")
 
+            # TODO: setting for writing out names
             logger.info(f"saved: {filename}")
         except UnidentifiedImageError:
             return
@@ -88,4 +89,5 @@ async def save_video_from_url(url, name, format="mp4", save_to_dir=None, categor
 
                     video.write(data)
 
+    # TODO: setting for writing out names
     logger.info(f"saved: {filename}")

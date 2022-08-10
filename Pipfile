@@ -8,6 +8,7 @@ httpx = "*"
 pydantic = "*"
 pillow = "*"
 asyncpraw = "*"
+tormysql = "*"
 
 [dev-packages]
 black = "*"
@@ -15,6 +16,7 @@ isort = "*"
 flake8 = "*"
 types-pillow = "*"
 autoflake = "*"
+cryptography = "*"
 
 [requires]
 python_version = "3.10"

@@ -18,5 +18,9 @@ class Config(BaseSettings):
     subreddits: List[str] = []
     categories: Dict[str, Any] = {}
 
+    global_post_limit: int = 100
+
+    db_conn: bool = False
+
 
 settings = Config()
