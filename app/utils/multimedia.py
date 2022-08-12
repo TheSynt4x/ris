@@ -34,9 +34,9 @@ async def save_image_from_url(url, name, format="png", save_to_dir=None, categor
         filename = f"{directory}/{filename}"
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-
         try:
+            response = await client.get(url)
+
             if os.path.isfile(f"assets/{filename}"):
                 logger.info(f"skipping: {filename}")
                 return
@@ -46,6 +46,8 @@ async def save_image_from_url(url, name, format="png", save_to_dir=None, categor
 
             # TODO: setting for writing out names
             logger.info(f"saved: {filename}")
+        except httpx.ReadTimeout:
+            return
         except UnidentifiedImageError:
             return
 
@@ -82,12 +84,15 @@ async def save_video_from_url(url, name, format="mp4", save_to_dir=None, categor
 
     with open(f"assets/{filename}", "wb") as video:
         async with httpx.AsyncClient() as client:
-            async with client.stream("GET", url) as response:
-                async for data in response.aiter_bytes():
-                    if not data:
-                        break
+            try:
+                async with client.stream("GET", url) as response:
+                    async for data in response.aiter_bytes():
+                        if not data:
+                            break
 
-                    video.write(data)
+                        video.write(data)
+            except httpx.ReadTimeout:
+                return
 
     # TODO: setting for writing out names
     logger.info(f"saved: {filename}")

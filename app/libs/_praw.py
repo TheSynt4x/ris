@@ -137,6 +137,8 @@ class PRAW:
 
                 if settings.db_conn and (sub_id or cat_id):
                     await db.create_submissions(all_submissions_list)
+                    logger.info(f"submissions saved: {len(all_submissions_list)}")
+
         except KeyboardInterrupt:
             await db.create_submissions(all_submissions_list)
 

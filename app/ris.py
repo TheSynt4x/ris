@@ -12,17 +12,20 @@ def load_subreddits_from_file():
     """
     Load subreddits from text file into Pydantic settings
     """
+    subs = []
 
     with open("subreddits.txt") as f:
-        settings.subreddits = [s.strip() for s in f.readlines()]
+        subs.extend([s.strip() for s in f.readlines()])
 
-    logger.info(f"loaded: {settings.subreddits}")
+    return subs
 
 
 def load_categories_from_file():
     if not os.path.exists("categories"):
         logger.info("no categories")
         return
+
+    cats = {}
 
     for file in os.listdir("categories"):
         if not file.endswith(".txt"):
@@ -32,31 +35,32 @@ def load_categories_from_file():
 
         with open(f"categories/{file}") as f:
             for c in f.readlines():
-                if category not in settings.categories:
-                    settings.categories[category] = [c.strip()]
+                if category not in cats:
+                    cats[category] = [c.strip()]
                 else:
-                    settings.categories[category].append(c.strip())
+                    cats[category].append(c.strip())
 
-    logger.info(f"loaded: {settings.categories}")
+    return cats
 
 
 async def load_subreddits_from_db():
     db_subreddits = await db._get("SELECT id, name FROM subreddits")
-    settings.subreddits = [s[1] for s in db_subreddits]
 
-    logger.info(f"loaded: {settings.subreddits}")
+    return [s[1] for s in db_subreddits]
 
 
 async def load_categories_from_db():
     db_categories = await db._get("SELECT id, name, subreddit FROM categories")
 
-    for (_, name, subreddit) in db_categories:
-        if name not in settings.categories:
-            settings.categories[name.lower()] = [subreddit.lower()]
-        else:
-            settings.categories[name.lower()].append(subreddit.lower())
+    cats = {}
 
-    logger.info(f"loaded: {settings.categories}")
+    for (_, name, subreddit) in db_categories:
+        if name not in cats:
+            cats[name.lower()] = [subreddit.lower()]
+        else:
+            cats[name.lower()].append(subreddit.lower())
+
+    return cats
 
 
 async def load_settings():
@@ -68,13 +72,16 @@ async def load_settings():
     if not db_settings:
         settings.db_conn = False
 
-        load_subreddits_from_file()
-        load_categories_from_file()
+        settings.subreddits = load_subreddits_from_file()
+        settings.categories = load_categories_from_file()
     else:
         settings.db_conn = True
 
-        await load_subreddits_from_db()
-        await load_categories_from_db()
+        settings.subreddits = await load_subreddits_from_db()
+        settings.categories = await load_categories_from_db()
+
+        settings.subreddits.extend(load_subreddits_from_file())
+        settings.categories.update(load_categories_from_file())
 
         if not (settings.client_id and settings.client_secret):
             logger.info("no client id set from sh file, loading from db")
@@ -92,6 +99,9 @@ async def load_settings():
             logger.error("connection must be established from sh file for user creds")
 
         # todo: dropbox api token
+
+    logger.info(f"loaded: {settings.subreddits}")
+    logger.info(f"loaded: {settings.categories}")
 
 
 async def main():
