@@ -1,13 +1,13 @@
 .PHONY: fmt
 fmt:
 	black .
-	isort .
+	isort . --profile black
 	autoflake --in-place --remove-all-unused-imports --recursive .
 
 .PHONY: lint
 lint:
 	black --check .
-	isort --check-only .
+	isort --profile black --check .
 	flake8 .
 
 .PHONY: devserver

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseSettings
 
@@ -9,6 +9,11 @@ class Config(BaseSettings):
     username: str
     password: str
 
+    mega_username: str
+    mega_password: str
+
+    webhook_url: Optional[str] = None
+
     user_agent: str = (
         "Mozilla/5.0 (Linux; Android 6.0; "
         "Nexus 5 Build/MRA58N) AppleWebKit/537.36 "
@@ -18,7 +23,7 @@ class Config(BaseSettings):
     subreddits: List[str] = []
     categories: Dict[str, Any] = {}
 
-    global_post_limit: int = 100
+    global_post_limit: int = 1
 
     db_conn: bool = False
 

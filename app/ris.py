@@ -1,10 +1,11 @@
 import asyncio
 import os
 
+import httpx
 from asyncpraw import Reddit
 
 from app.core import logger, settings
-from app.libs import db, praw
+from app.libs import db, praw, upload
 from app.utils import find_in_sql_tuple
 
 
@@ -134,3 +135,9 @@ async def main():
         logger.info(f"fetching content from {len(subreddits)} subs")
 
         await asyncio.gather(*subreddits)
+
+        if settings.mega_username and settings.mega_password and settings.webhook_url:
+            uploaded_url = upload.upload()
+
+            async with httpx.AsyncClient() as client:
+                await client.post(settings.webhook_url, json={"content": uploaded_url})

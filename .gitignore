@@ -12,3 +12,5 @@ scripts/devserver.sh
 
 subreddits.txt
 .mypy_cache/**
+
+**/*.zip
