@@ -12,6 +12,8 @@ tormysql = "*"
 aioconsole = "*"
 pycryptodome = "*"
 tenacity = "*"
+pymysql = "*"
+jurigged = "*"
 
 [dev-packages]
 black = "*"
