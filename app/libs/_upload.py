@@ -9,7 +9,11 @@ class Upload:
     def __init__(self):
         self.api = Mega()
 
-        self.api.login(settings.mega_username, settings.mega_password)
+        if settings.mega_username and settings.mega_password:
+            self.login(settings.mega_username, settings.mega_password)
+
+    def login(self, username, password):
+        self.api.login(username, password)
 
     def upload(self):
         filename = f"assets-{date.today()}"

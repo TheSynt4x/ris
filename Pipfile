@@ -9,6 +9,9 @@ pydantic = "*"
 pillow = "*"
 asyncpraw = "*"
 tormysql = "*"
+aioconsole = "*"
+pycryptodome = "*"
+tenacity = "*"
 
 [dev-packages]
 black = "*"
