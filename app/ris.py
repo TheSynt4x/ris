@@ -1,11 +1,8 @@
-import asyncio
 import os
 
-import httpx
-from asyncpraw import Reddit
-
 from app.core import logger, settings
-from app.libs import db, praw, upload
+from app.libs import db
+from app.terminal import cmd_terminal
 from app.utils import find_in_sql_tuple
 
 
@@ -112,32 +109,4 @@ async def main():
 
     await load_settings()
 
-    async with Reddit(
-        client_id=settings.client_id,
-        client_secret=settings.client_secret,
-        user_agent=settings.user_agent,
-        username=settings.username,
-        password=settings.password,
-    ) as reddit:
-        subreddits = []
-
-        if settings.categories.values():
-            for category, subs in settings.categories.items():
-                for subreddit in subs:
-                    if subreddit in settings.subreddits:
-                        continue
-
-                    subreddits.append(praw.get_submissions(reddit, subreddit, category))
-
-        for subreddit in settings.subreddits:
-            subreddits.append(praw.get_submissions(reddit, subreddit))
-
-        logger.info(f"fetching content from {len(subreddits)} subs")
-
-        await asyncio.gather(*subreddits)
-
-        if settings.mega_username and settings.mega_password and settings.webhook_url:
-            uploaded_url = upload.upload()
-
-            async with httpx.AsyncClient() as client:
-                await client.post(settings.webhook_url, json={"content": uploaded_url})
+    await cmd_terminal.start()

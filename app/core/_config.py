@@ -9,8 +9,8 @@ class Config(BaseSettings):
     username: str
     password: str
 
-    mega_username: str
-    mega_password: str
+    mega_username: Optional[str] = None
+    mega_password: Optional[str] = None
 
     webhook_url: Optional[str] = None
 
