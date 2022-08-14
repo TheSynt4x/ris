@@ -1,18 +1,27 @@
 import tormysql
 
+from app.core import settings
 from app.utils import types
 
 
 class DatabaseWrapper:
     def __init__(self) -> None:
+        self.create_pool(
+            settings.db_hostname,
+            settings.db_username,
+            settings.db_password,
+            settings.db_database,
+        )
+
+    def create_pool(self, hostname, username, password, database):
         self.pool = tormysql.helpers.ConnectionPool(
             max_connections=20,
             idle_seconds=7200,
             wait_connection_timeout=3,
-            host="127.0.0.1",
-            user="user",
-            passwd="1234",
-            db="ris",
+            host=hostname,
+            user=username,
+            passwd=password,
+            db=database,
             charset="utf8",
         )
 

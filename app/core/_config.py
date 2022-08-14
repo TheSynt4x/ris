@@ -26,6 +26,10 @@ class Config(BaseSettings):
     global_post_limit: int = 1
 
     db_conn: bool = False
+    db_hostname: Optional[str] = None
+    db_username: Optional[str] = None
+    db_password: Optional[str] = None
+    db_database: Optional[str] = None
 
 
 settings = Config()
