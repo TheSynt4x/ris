@@ -24,7 +24,7 @@ class Config:
             logger.info(f"loaded: {settings.subreddits}")
 
         elif args[0] == "categories" and len(args) == 3:
-            # config categories nsfw 2
+            # config categories nsfw {num}
 
             cats = {args[1]: [await ainput("subreddit: ") for _ in range(int(args[2]))]}
             settings.categories.update(cats)
