@@ -25,7 +25,7 @@ class DatabaseWrapper:
             charset="utf8",
         )
 
-    async def _get(self, sql, *args):
+    async def _get(self, sql, *args, cursor_cls=None):
         """
         Executes any SQL query with arguments and retrieves results from it
 
@@ -34,11 +34,11 @@ class DatabaseWrapper:
             - args: arguments to pass into the query
         """
 
-        cursor = await self.pool.execute(sql, *args)
+        cursor = await self.pool.execute(sql, *args, cursor_cls=cursor_cls)
 
         return cursor.fetchall()
 
-    async def get(self, table, limit=None):
+    async def get(self, table, limit=None, cursor_cls=None):
         """
         Generic method for getting results from a table
 
@@ -52,7 +52,7 @@ class DatabaseWrapper:
         if limit is not None:
             sql += f" LIMIT {limit}"
 
-        return await self._get(sql)
+        return await self._get(sql, cursor_cls=cursor_cls)
 
     async def get_submissions_by_category(self, category_id, type=types.NEW):
         """

@@ -23,13 +23,16 @@ class Config(BaseSettings):
     subreddits: List[str] = []
     categories: Dict[str, Any] = {}
 
-    global_post_limit: int = 1
+    global_post_limit: int = 20
 
     db_conn: bool = False
     db_hostname: Optional[str] = None
     db_username: Optional[str] = None
     db_password: Optional[str] = None
     db_database: Optional[str] = None
+
+    class Config:
+        env_file = ".env"
 
 
 settings = Config()

@@ -42,6 +42,12 @@ class PRAW:
 
         try:
             async for submission in submissions.new(limit=global_post_limit):
+                if not (
+                    submission.url.startswith("http://")
+                    or submission.url.startswith("https://")
+                ):
+                    continue
+
                 if settings.db_conn:
                     db_submission = await db.get_image_by_id(submission.id)
 

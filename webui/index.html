@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>WebSocket Client</title>
+  </head>
+
+  <body>
+    <div id="images"></div>
+  </body>
+
+  <script>
+    let socket = new WebSocket("ws://localhost:8001");
+
+    const send = (message) => {
+      if (!socket.readyState) return;
+
+      socket.send(message);
+    };
+
+    window.addEventListener("DOMContentLoaded", () => {
+      socket.addEventListener("open", function (event) {
+        socket.send("init");
+        socket.send("get_content");
+      });
+
+      socket.onmessage = (m) => {
+        const data = JSON.parse(m.data);
+
+        const type = data.type;
+
+        let received;
+        try {
+          received = JSON.parse(data.message);
+        } catch (e) {
+          //
+        }
+
+        if (data.type === "submissions") {
+          console.log(received);
+
+          document.getElementById("images").innerHTML = received.filter(i => !!i.url).map((i) => {
+            if (i.url.endsWith('jpg') || i.url.endsWith('png') || i.url.endsWith('gif')) {
+              return '<img src="' + i.url + '"/>';
+            } else if (i.url.endsWith('mp4')) {
+              return '<video src="'+i.url+'" controls></video>';
+            }
+          });
+        }
+      };
+
+      socket.onclose = () => {
+        socket = new WebSocket("ws://localhost:8001");
+      };
+    });
+  </script>
+</html>
