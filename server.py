@@ -17,6 +17,8 @@ async def send(websocket, type, message):
 
 async def handler(websocket):
     async for message in websocket:
+        # todo: implement handlers
+
         if message == "init":
             logger.info(f"sending settings: {settings.subreddits}")
             await send(websocket, "subreddits", settings.subreddits)
@@ -25,16 +27,27 @@ async def handler(websocket):
 
         elif message == "get_content":
             if settings.db_conn:
+                # todo: implement message arguments, so message can send limit={x}
                 images = await libs.db.get(
                     "submissions", limit=392, cursor_cls=pymysql.cursors.DictCursor
                 )
             else:
                 images = []
 
+                # todo: move to utils, implement limit={x} logic
                 for path in Path("assets").rglob("*"):
                     images.append({"url": str(path.absolute())})
 
             await send(websocket, "submissions", images)
+
+        elif message == "add_subreddit":
+            pass
+
+        elif message == "add_category":
+            pass
+
+        elif message == "run":
+            pass
 
 
 async def main():
