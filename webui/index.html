@@ -27,10 +27,10 @@
     };
 
     window.addEventListener("DOMContentLoaded", () => {
-      socket.addEventListener("open", function (event) {
+      socket.onopen = () => {
         socket.send("init");
         socket.send("get_content");
-      });
+      }
 
       socket.onmessage = (m) => {
         const data = JSON.parse(m.data);
