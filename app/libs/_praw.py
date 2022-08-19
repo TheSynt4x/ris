@@ -1,15 +1,17 @@
 import os
 import sys
 
-from asyncpraw import Reddit
-
 from app.core import logger, settings
 from app.libs import db
+from app.utils import types
 from app.utils.multimedia import save_image_from_url, save_video_from_url
+from asyncpraw import Reddit
 
 
 class PRAW:
-    async def get_submissions(self, reddit: Reddit, sub: str, cat: str = None) -> None:
+    async def get_submissions(
+        self, reddit: Reddit, sub: str, cat: str = None, section: str = types.NEW
+    ) -> None:
         """
         Get reddit submissions and save them
 
@@ -40,8 +42,15 @@ class PRAW:
                     cat_id = db_category[0][0]
                     global_post_limit = db_category[0][3]
 
+        if section == types.NEW:
+            submissions = submissions.new(limit=global_post_limit)
+        elif section == types.HOT:
+            submissions = submissions.hot(limit=global_post_limit)
+        elif section == types.TOP:
+            submissions = submissions.top(limit=global_post_limit)
+
         try:
-            async for submission in submissions.new(limit=global_post_limit):
+            async for submission in submissions:
                 if not (
                     submission.url.startswith("http://")
                     or submission.url.startswith("https://")

@@ -11,6 +11,8 @@ class Run:
     name = "run"
 
     async def handle(self, *args):
+        section = args[0] if len(args) else None
+
         async with Reddit(
             client_id=settings.client_id,
             client_secret=settings.client_secret,
@@ -27,11 +29,18 @@ class Run:
                             continue
 
                         subreddits.append(
-                            libs.praw.get_submissions(reddit, subreddit, category)
+                            libs.praw.get_submissions(
+                                reddit,
+                                subreddit,
+                                category,
+                                section=section,
+                            )
                         )
 
             for subreddit in settings.subreddits:
-                subreddits.append(libs.praw.get_submissions(reddit, subreddit))
+                subreddits.append(
+                    libs.praw.get_submissions(reddit, subreddit, section=section)
+                )
 
             logger.info(f"fetching content from {len(subreddits)} subs")
 
