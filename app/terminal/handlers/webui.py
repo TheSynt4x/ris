@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 import threading
@@ -9,7 +10,7 @@ class WebUI:
     name = "webui"
 
     async def handle(self, *args):
-        def run():
+        def run_server():
             logger.info("starting server...")
 
             return subprocess.run(
@@ -17,5 +18,12 @@ class WebUI:
                 creationflags=subprocess.CREATE_NEW_CONSOLE,
             )
 
-        thread = threading.Thread(target=run)
-        thread.start()
+        def run_client():
+            logger.info("starting client...")
+            os.system("start ./webui/index.html")
+
+        server = threading.Thread(target=run_server)
+        server.start()
+
+        client = threading.Thread(target=run_client)
+        client.start()
