@@ -93,6 +93,8 @@ async def save_video_from_url(url, name, format="mp4", save_to_dir=None, categor
                         video.write(data)
             except httpx.ReadTimeout:
                 return
+            except httpx.ConnectTimeout:
+                return
 
     # TODO: setting for writing out names
     logger.info(f"saved: {filename}")
