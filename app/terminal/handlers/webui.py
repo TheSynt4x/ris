@@ -1,3 +1,7 @@
+import subprocess
+import sys
+import threading
+
 from app.core import logger
 
 
@@ -5,6 +9,13 @@ class WebUI:
     name = "webui"
 
     async def handle(self, *args):
-        # todo: look more into subprocess and other solutions
+        def run():
+            logger.info("starting server...")
 
-        logger.info("run make webui in another terminal window")
+            return subprocess.run(
+                [sys.executable, "server.py"],
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+            )
+
+        thread = threading.Thread(target=run)
+        thread.start()
