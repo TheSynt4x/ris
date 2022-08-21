@@ -6,8 +6,9 @@ from pathlib import Path
 
 import websockets
 
-from app import loader
+from app import loader, services
 from app.core import logger, settings
+from app.utils import types
 
 
 async def send(websocket, type, message):
@@ -59,6 +60,16 @@ async def handler(websocket):
                 images = images[: recv["params"]["limit"]]
 
             await send(websocket, "submissions", images)
+        elif recv["command"] == "run":
+            section = types.NEW
+            if "section" in recv.get("params", {}):
+                section = recv["params"]["section"]
+
+            limit = settings.global_post_limit
+            if "limit" in recv.get("params", {}):
+                limit = recv["params"]["limit"]
+
+            await services.sync.sync_subs(section, limit)
 
 
 async def main():

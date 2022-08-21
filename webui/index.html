@@ -19,8 +19,9 @@
       <div class="container">
         <p class="text-center">total: {{ sortedSubmissions.length }}</p>
 
+        <button class="btn btn-primary" @click="run">run</button>
+
         <div class="row row-cols-5">
-          
           <div
             class="col"
             v-for="submission in sortedSubmissions"
@@ -60,6 +61,10 @@
           if (!this.socket.readyState) return;
 
           this.socket.send(JSON.stringify({ command, params }));
+        },
+
+        run() {
+          this.send("run");
         },
       },
 
