@@ -97,6 +97,6 @@ async def load_settings():
 
         # todo: dropbox api token
 
-    logger.info(f'db: {settings.db_conn}')
+    logger.info(f"db: {settings.db_conn}")
     logger.info(f"loaded: {settings.subreddits}")
     logger.info(f"loaded: {settings.categories}")
