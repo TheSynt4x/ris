@@ -14,9 +14,13 @@ lint:
 devserver:
 	sh ./scripts/devserver.sh
 
+.PHONY: webui
+webui:
+	jurigged server.py
+
 .PHONY: install
 install:
-	mv scripts/devserver.example.sh scripts/devserver.sh
+	mv scripts/.env.example scripts/.env
 	mv subreddits.example.txt subreddits.txt
 	mkdir -p logs/
 	mkdir -p assets/

@@ -2,7 +2,7 @@ import shutil
 from datetime import date
 
 from app.core import settings
-from mega import Mega
+from app.libs.mega import Mega
 
 
 class Upload:
