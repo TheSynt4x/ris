@@ -61,10 +61,13 @@ async def load_categories_from_db():
 
 
 async def load_settings():
-    try:
-        db_settings = await db.get_settings()
-    except Exception:
-        db_settings = None
+    db_settings = None
+
+    if os.environ.get("DB_HOSTNAME") and os.environ.get("DB_DATABASE"):
+        try:
+            db_settings = await db.get_settings()
+        except Exception:
+            db_settings = None
 
     if not db_settings:
         settings.db_conn = False

@@ -48,6 +48,8 @@ async def save_image_from_url(url, name, format="png", save_to_dir=None, categor
             logger.info(f"saved: {filename}")
         except httpx.ReadTimeout:
             return
+        except httpx.ConnectTimeout:
+            return
         except UnidentifiedImageError:
             return
 
